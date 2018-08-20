@@ -1,16 +1,16 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\Nick\\Desktop\\RemoteBluetooth02\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
+            "outputFile": "C:\\Users\\Lattice Innovations\\bluetoothapp\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Nick\\Desktop\\RemoteBluetooth02\\app\\src\\main\\res\\values\\strings.xml",
+                    "source": "C:\\Users\\Lattice Innovations\\bluetoothapp\\app\\src\\main\\res\\values\\strings.xml",
                     "from": {
                         "startLines": "3,5,4,8,13,14,2,11,9,10,12,15,16,17,7,6",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "119,221,172,460,771,824,55,646,517,585,702,883,942,1001,388,324",
+                        "startOffsets": "122,226,176,468,784,838,57,657,526,595,714,898,958,1018,395,330",
                         "endColumns": "52,102,48,56,52,58,63,55,67,60,68,58,58,61,71,63",
-                        "endOffsets": "167,319,216,512,819,878,114,697,580,641,766,937,996,1058,455,383"
+                        "endOffsets": "170,324,220,520,832,892,116,708,589,651,778,952,1012,1075,462,389"
                     },
                     "to": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17",
