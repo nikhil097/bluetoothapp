@@ -289,11 +289,11 @@ public class RemoteBluetooth extends Activity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-			mCommandService.write(BluetoothCommandService.VOL_UP);
+		//	mCommandService.write(BluetoothCommandService.VOL_UP);
 			return true;
 		}
 		else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
-			mCommandService.write(BluetoothCommandService.VOL_DOWN);
+		//	mCommandService.write(BluetoothCommandService.VOL_DOWN);
 			return true;
 		}
 		

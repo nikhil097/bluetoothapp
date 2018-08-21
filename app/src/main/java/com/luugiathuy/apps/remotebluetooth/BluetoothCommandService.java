@@ -173,17 +173,7 @@ public class BluetoothCommandService {
         r.write(out);
     }
     
-    public void write(int out) {
-    	// Create temporary object
-        ConnectedThread r;
-        // Synchronize a copy of the ConnectedThread
-        synchronized (this) {
-            if (mState != STATE_CONNECTED) return;
-            r = mConnectedThread;
-        }
-        // Perform the write unsynchronized
-        r.write(out);
-    }
+
     
     /**
      * Indicate that the connection attempt failed and notify the UI Activity.
@@ -317,7 +307,7 @@ public class BluetoothCommandService {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
         int frameSequence=0;
-        boolean isFirstFrame=false;
+        boolean isConfigFrame=true;
 
         public ConnectedThread(BluetoothSocket socket) {
             Log.d(TAG, "create ConnectedThread");
@@ -347,7 +337,15 @@ public class BluetoothCommandService {
                     // Read from the InputStream
                     int bytes = mmInStream.read(buffer);
 
+                    Log.v("bufferconfig",buffer[1]+"");
 
+                    if(buffer[1]== 0x55 && isConfigFrame)
+                    {
+                        byte[] configBuffer=new byte[]{(byte) 0xa5,0x55,0x01,0x00, (byte) 0xa2};
+                        write(configBuffer);
+                        isConfigFrame=false;
+                    }
+                    else if(!isConfigFrame && Integer.parseInt(String.valueOf(buffer[1]))==-86){
 
                     //    public static String byteArrayToHex(byte[] a){
                     StringBuilder sb = new StringBuilder(buffer.length * 2);
@@ -355,49 +353,64 @@ public class BluetoothCommandService {
                         sb.append(String.format("%02x", b));
                     String bufferSteing = sb.toString();
 
-                    if (bufferSteing.startsWith("a5aa")) {
 
 
                         Log.v("bytes", bufferSteing);
 
 
-                        byte[] writeBuffer = new byte[]{(byte) 0xa5, 0x55, 0x02, 0x00, 0x00, (byte) 0xf7};
+                        byte[] writeBuffer = new byte[]{(byte) 0xa5, (byte) 0xaa, 0x02, 0x00, 0x00, (byte) 0xf7};
 
 
-                            write(writeBuffer);
-                            isFirstFrame = false;
+                      //  write(writeBuffer);
+                    //    isFirstFrame = false;
 
 
-                            String frameNo = String.valueOf(buffer[3]);
-                            frameSequence = Integer.parseInt(frameNo, 16);
+                       /*String frameNo = String.valueOf(buffer[3]);
+                        frameSequence = Integer.parseInt(frameNo, 16);
 
-                            if (frameSequence < 0) {
-                                frameSequence = 1;
-                            }
-                            writeBuffer[3] = buffer[3];
+                        if (frameSequence < 0) {
+                            frameSequence = 1;
+                        }*/
+                        writeBuffer[3] = buffer[3];
 
-                            StringBuilder sb01 = new StringBuilder(writeBuffer.length * 2);
-                            for (int i = 0; i < 5; i++)
-                                sb01.append(String.format("%02x", writeBuffer[i]));
-                            String bufferSteing01 = sb01.toString();
-                            Log.v("ackstring", bufferSteing01);
+                        writeBuffer[1]=buffer[1];
 
 
-                            writeBuffer[5] = (byte) CRC_check(bufferSteing01);
+                        StringBuilder sb01 = new StringBuilder(writeBuffer.length * 2);
+                        for (int i = 0; i < 5; i++)
+                            sb01.append(String.format("%02x", writeBuffer[i]));
+                        String bufferSteing01 = sb01.toString();
+                        Log.v("ackstring", bufferSteing01);
 
-                        StringBuilder sb02 = new StringBuilder(writeBuffer.length * 2);
+
+                        writeBuffer[5] = (byte) CRC_check(bufferSteing01);
+
+
+                                             StringBuilder sb02 = new StringBuilder(writeBuffer.length * 2);
                         for (byte b : writeBuffer)
                             sb02.append(String.format("%02x", b));
-                        String bufferSteing02=sb02.toString();
+                        String bufferSteing02 = sb02.toString();
 
-                            Log.v("hex", String.valueOf(writeBuffer[5]));
+                        Log.v("hex", String.valueOf(writeBuffer[5]));
 
-                           // for(int i=0;i<5;i++)
-                            //{
-                                Log.v("byte", bufferSteing02);
-                          //  }
+                        // for(int i=0;i<5;i++)
+                        //{
+                        Log.v("byte", bufferSteing02);
+                        //  }
+                        StringBuilder sb04 = new StringBuilder(buffer.length * 2);
+                            for(int i=0;i<59;i++)
+                            sb04.append(String.format("%02x", buffer[i]));
+                        String bufferSteing04 = sb04.toString();
 
-                        if(buffer[33]==CRC_check(bufferSteing)) {
+                        Log.v("hex", String.valueOf(bufferSteing04));
+
+                        int crcRead = CRC_check(bufferSteing04);
+                        
+
+
+                        Log.v("Crc check",buffer[59]+" "+crcRead);
+
+                        if (buffer[60] == crcRead) {
 
                             write(writeBuffer);
                         }
@@ -479,22 +492,17 @@ public class BluetoothCommandService {
         public void write(byte[] buffer) {
             try {
                 String bufferstring="a5550100a2";
-                byte [] buffer03=new byte[]{(byte) 0xa5, (byte) 0x55,0x01,0x00, (byte) 0xa2};
+             //   byte [] buffer03=new byte[]{(byte) 0xa5, Byte.parseByte("ffaa"),0x01,0x00, (byte) 0xa2};
                 byte buffer01[]=bufferstring.getBytes();
                 byte [] buffer02=new byte[]{(byte) 0xa5,0x55,0x01,0x00, (byte) 0xa2};
 
-                if(isConnection) {
-                    mmOutStream.write(buffer02);
-                    isConnection=false;
-                }
-                else{
 
                 //for(int i=0;i<100000;i++) {
                     mmOutStream.write(buffer);
                   //  Thread.sleep(1000);
                 //}
-                }
-                // Share the sent message back to the UI Activity
+                //
+                //Share the sent message back to the UI Activity
 //                mHandler.obtainMessage(BluetoothChat.MESSAGE_WRITE, -1, -1, buffer)
 //                        .sendToTarget();
             } catch (Exception e) {
@@ -502,7 +510,7 @@ public class BluetoothCommandService {
             }
         }
         
-        public void write(int out) {
+     /*   public void write(int out) {
         	try {
 
         	    byte[] buffer01=new byte[1024];
@@ -531,7 +539,7 @@ public class BluetoothCommandService {
                 e.printStackTrace();
             }
         }
-
+*/
         public void cancel() {
             try {
             	mmOutStream.write(EXIT_CMD);
