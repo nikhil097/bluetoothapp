@@ -337,7 +337,7 @@ public class BluetoothCommandService {
                     // Read from the InputStream
                     int bytes = mmInStream.read(buffer);
 
-                    Log.v("bufferconfig",buffer[1]+"");
+                 //   Log.v("bufferconfig",buffer[1]+"");
 
                     if(buffer[1]== 0x55 && isConfigFrame)
                     {
@@ -373,14 +373,13 @@ public class BluetoothCommandService {
                         }*/
                         writeBuffer[3] = buffer[3];
 
-                        writeBuffer[1]=buffer[1];
+                  //      writeBuffer[1]=buffer[1];
 
 
                         StringBuilder sb01 = new StringBuilder(writeBuffer.length * 2);
                         for (int i = 0; i < 5; i++)
                             sb01.append(String.format("%02x", writeBuffer[i]));
                         String bufferSteing01 = sb01.toString();
-                        Log.v("ackstring", bufferSteing01);
 
 
                         writeBuffer[5] = (byte) CRC_check(bufferSteing01);
@@ -397,27 +396,43 @@ public class BluetoothCommandService {
                         //{
                         Log.v("byte", bufferSteing02);
                         //  }
-                        StringBuilder sb04 = new StringBuilder(buffer.length * 2);
-                            for(int i=0;i<59;i++)
+                        StringBuilder sb04 = new StringBuilder(buffer.length * 2-2);
+                            for(int i=0;i<57;i++)
                             sb04.append(String.format("%02x", buffer[i]));
+
                         String bufferSteing04 = sb04.toString();
 
-                        Log.v("hex", String.valueOf(bufferSteing04));
+                        Log.v("hexstring", String.valueOf(bufferSteing04));
 
-                        int crcRead = CRC_check(bufferSteing04);
+                         byte crcRead = (byte) CRC_check(bufferSteing04);
                         
 
 
-                        Log.v("Crc check",buffer[59]+" "+crcRead);
+                        Log.v("Crc check",buffer[57]+" "+crcRead);
 
-                        if (buffer[60] == crcRead) {
+                        if (buffer[57] == crcRead) {
 
                             write(writeBuffer);
                         }
+                        else{
+                            writeBuffer[4]=  0x01;
+                            StringBuilder sb05 = new StringBuilder(writeBuffer.length * 2);
+                            for (int i = 0; i < 5; i++)
+                                sb05.append(String.format("%02x", writeBuffer[i]));
+                            String bufferSteing05 = sb05.toString();
+                            Log.v("nakstring",bufferSteing05);
+                            write(writeBuffer);
+
+                           // isConfigFrame=true;
+                        }
+                  //      Log.v("ackstring", bufferSteing01);
+
                         frameSequence++;
 
 
                         }
+
+
                         // Send the obtained bytes to the UI Activity
                         mHandler.obtainMessage(RemoteBluetooth.MESSAGE_READ, bytes, -1, buffer)
                                 .sendToTarget();
